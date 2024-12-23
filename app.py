@@ -90,7 +90,7 @@ def load_scraped_data(file_path: str) -> pd.DataFrame:
         scraped_data = pd.read_csv(file_path)
         scraped_data = scraped_data.dropna(subset=['latitude', 'longitude', 'hotel_type', 'num_review'])
         scraped_data['price_range'] = pd.cut(scraped_data['price'], bins=[0, 200, 500, 1000, np.inf],
-                                             labels=['Cheap', 'Moderate', 'Expensive', 'Luxury'])
+                                             labels=['cheap', 'moderate', 'expensive', 'luxury'])
         st.success("...csv file loaded successfully!")
         return scraped_data
     except FileNotFoundError:
@@ -226,9 +226,9 @@ def home_content(dark_mode):
 
                     with col_data:
                         with st.container():
-                            st.write(f"### top 5 hotels sorted by {top_5_referring}:")
+                            st.write(f"#### top 5 hotels sorted by {top_5_referring}:")
                             for index, row in top_5_hotels.iterrows():
-                                st.markdown(f"**{row['name']}**")  # Nazwa hotelu
+                                st.markdown(f"**{row['name']}** " + f"[click here to visit the hotel]({row['link']})") # Link do strony hotelu na booking
                                 col1, col2 = st.columns(2)  # Dwie kolumny dla metryk
 
                                 with col1:
@@ -239,9 +239,6 @@ def home_content(dark_mode):
                                     st.metric(label="review rate", value=f"{row['rate_review']} / 10")
                                     st.metric(label="distance to city center", value=f"{row['distance']} m")
 
-                                # Link do hotelu i separator
-                                st.markdown(f"[click here to visit the hotel]({row['link']})")
-                                st.write("---")
 
                     # st.subheader("3D Hotel Trends")
                     # if not scraped_data.empty:
@@ -444,6 +441,15 @@ def home_content(dark_mode):
                     st.plotly_chart(fig_3d, use_container_width=True)
                 else:
                     st.error(f"Selected columns are not in the data: {x_axis_3d}, {y_axis_3d}, {z_axis_3d}.")
+            with col2:
+                st.write("""
+                #### price categories description:
+
+                - **cheap**: items priced from 0 to 200 per night. these are affordable options suitable for budget-conscious buyers.
+                - **moderate**: prices between 200 and 500 per night. these items are moderately priced and offer a balance between quality and cost.
+                - **expensive**: items priced from 500 to 1000 per night. these are higher-priced items often associated with luxury features or premium brands.
+                - **luxury**: items priced over 1000 per night. these are high-end, exclusive products often linked to top-quality materials or prestigious brands.
+                """)
 
             st.divider()
 
