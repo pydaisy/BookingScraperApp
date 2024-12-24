@@ -89,8 +89,6 @@ def load_scraped_data(file_path: str) -> pd.DataFrame:
     try:
         scraped_data = pd.read_csv(file_path)
         scraped_data = scraped_data.dropna(subset=['latitude', 'longitude', 'hotel_type', 'num_review'])
-        scraped_data['price_range'] = pd.cut(scraped_data['price'], bins=[0, 200, 500, 1000, np.inf],
-                                             labels=['cheap', 'moderate', 'expensive', 'luxury'])
         st.success("...csv file loaded successfully!")
         return scraped_data
     except FileNotFoundError:
@@ -121,6 +119,7 @@ def home_content(dark_mode):
         with col3:
             checkout = st.date_input("check-out", value=date.today() + datetime.timedelta(days=1),
                                      min_value=date.today() + datetime.timedelta(days=1))
+        num_days = (checkout - checkin).days # Liczba nocy
         with col4:
             adults_count = st.number_input("adults", min_value=1, value=2, step=1, help="number of adults")
 
@@ -153,6 +152,8 @@ def home_content(dark_mode):
                         # Spinner podczas ładowania danych
                         with st.spinner("loading scraped data..."):
                             scraped_data = load_scraped_data(data_file)
+                            scraped_data['price_range'] = pd.cut(scraped_data['price']/num_days, bins=[0, 150, 300, 500, np.inf],
+                                                                 labels=['cheap', 'moderate', 'expensive', 'luxury'])
                             st.session_state["scraped_data"] = scraped_data
                     except Exception as e:
                         st.error(f"oops! an error occurred during scraping: {e}")
@@ -407,23 +408,36 @@ def home_content(dark_mode):
                         color_continuous_scale=generate_color_palette(dark_mode)['palette']
                     )
 
-                    treemap_fig.update_traces(root_color='rgba(0,0,0,0)', marker=dict(cornerradius=5))
-                    treemap_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)',
-                                              plot_bgcolor='rgba(0,0,0,0)',
-                                              margin=dict(t=30, l=25, r=25, b=25),
-                                              font=dict(family="Roboto Mono"),
-                                              modebar=dict(bgcolor='rgba(0,0,0,0)'))
+                    # Aktualizacja etykiet w treemap
+                    treemap_fig.update_traces(
+                        root_color='rgba(0,0,0,0)',
+                        marker=dict(cornerradius=5)
+                    )
+
+                    # Aktualizacja tytułów osi i ogólnej etykiety koloru
+                    treemap_fig.update_layout(
+                        coloraxis_colorbar=dict(
+                            tickfont=dict(color=generate_color_palette(dark_mode)['title']),
+                            # Zmiana koloru tekstu etykiet na skali kolorów
+                            titlefont=dict(color=generate_color_palette(dark_mode)['text'])  # Zmiana koloru tytułu skali kolorów
+                        ),
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        margin=dict(t=30, l=25, r=25, b=25),
+                        font=dict(family="Roboto Mono"),
+                        modebar=dict(bgcolor='rgba(0,0,0,0)')
+                    )
 
                     st.plotly_chart(treemap_fig, use_container_width=True)
                 else:
                     st.write(scraped_data.columns)
                     st.error("oops! columns do not exist.")
             if "scraped_data" in st.session_state and not st.session_state["scraped_data"].empty:
-                st.subheader("3D Scatter Plot")
+                st.subheader("3D scatter plot: distance, rate_review, rating_stars")
                 options = ['distance', 'rate_review', 'rating_stars', 'num_review', 'price']
-                x_axis_3d = st.selectbox("Select X-axis (3D)", options, index=0, key="x_3d")
-                y_axis_3d = st.selectbox("Select Y-axis (3D)", options, index=1, key="y_3d")
-                z_axis_3d = st.selectbox("Select Z-axis (3D)", options, index=2, key="z_3d")
+                x_axis_3d = st.selectbox("select X-axis (3D)", options, index=0, key="x_3d")
+                y_axis_3d = st.selectbox("select Y-axis (3D)", options, index=1, key="y_3d")
+                z_axis_3d = st.selectbox("select Z-axis (3D)", options, index=2, key="z_3d")
 
                 if all(col in scraped_data.columns for col in [x_axis_3d, y_axis_3d, z_axis_3d]):
                     fig_3d = px.scatter_3d(
@@ -433,22 +447,33 @@ def home_content(dark_mode):
                         z=z_axis_3d,
                         color=z_axis_3d,
                         size=x_axis_3d,
-                        color_continuous_scale=generate_color_palette(dark_mode)['palette'],
-                        title=f"3D Scatter Plot: {x_axis_3d}, {y_axis_3d}, {z_axis_3d}"
+                        color_continuous_scale=generate_color_palette(dark_mode)['palette']
                     )
                     fig_3d.update_traces(marker=dict(opacity=0.7))
-                    fig_3d.update_layout(height=700)
+                    fig_3d.update_layout(
+                        coloraxis_colorbar=dict(
+                            tickfont=dict(color=generate_color_palette(dark_mode)['title']),
+                            # Zmiana koloru tekstu etykiet na skali kolorów
+                            titlefont=dict(color=generate_color_palette(dark_mode)['text'])  # Zmiana koloru tytułu skali kolorów
+                        ),
+                        height=700,
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        margin=dict(t=30, l=25, r=25, b=25),
+                        font=dict(family="Roboto Mono"),
+                        modebar=dict(bgcolor='rgba(0,0,0,0)'))
+
                     st.plotly_chart(fig_3d, use_container_width=True)
                 else:
-                    st.error(f"Selected columns are not in the data: {x_axis_3d}, {y_axis_3d}, {z_axis_3d}.")
+                    st.error(f"selected columns are not in the data: {x_axis_3d}, {y_axis_3d}, {z_axis_3d}.")
             with col2:
                 st.write("""
                 #### price categories description:
 
-                - **cheap**: items priced from 0 to 200 per night. these are affordable options suitable for budget-conscious buyers.
-                - **moderate**: prices between 200 and 500 per night. these items are moderately priced and offer a balance between quality and cost.
-                - **expensive**: items priced from 500 to 1000 per night. these are higher-priced items often associated with luxury features or premium brands.
-                - **luxury**: items priced over 1000 per night. these are high-end, exclusive products often linked to top-quality materials or prestigious brands.
+                - **cheap**: items priced from 0 to 150 per night. these are affordable options suitable for budget-conscious buyers.
+                - **moderate**: prices between 150 and 300 per night. these items are moderately priced and offer a balance between quality and cost.
+                - **expensive**: items priced from 300 to 500 per night. these are higher-priced items often associated with luxury features or premium brands.
+                - **luxury**: items priced over 500 per night. these are high-end, exclusive products often linked to top-quality materials or prestigious brands.
                 """)
 
             st.divider()
@@ -494,9 +519,13 @@ def write_about(dark_mode):
            - use scatter plots and histograms to analyze relationships between metrics like price and reviews.  
            - switch to 3D views for a more dynamic exploration of data.  
         4. **top picks**:
-           - identify the best hotels based on your preferred metrics (e.g., lowest price, highest rating).  
+           - identify the best hotels based on your preferred metrics (e.g., lowest price, highest rating).
+           
+        **pro-tip**: if you're unsure about any feature, hover over the question mark icons (❓) to get more details.  
         """
     )
+
+    st.image("data/image_doc_1.png", caption="example of filtering hotels by criteria", width=800)
 
     st.subheader("🔧 **what’s under the hood?**")
     st.write(
@@ -550,7 +579,7 @@ def write_about(dark_mode):
             """
         )
 
-    with st.expander("scraping_details.py"):
+    with st.expander("scraper_hotel_details.py"):
         st.write(
             """
             ### description of `scraping_details.py`
@@ -745,7 +774,7 @@ def main():
             st.session_state["page"] = "about"
 
     # Dark mode toggle button
-    dark_mode = st.toggle("dark mode", value=False)
+    dark_mode = st.toggle("switch mode", value=False)
     apply_theme(dark_mode)
 
     st.title("🕸️booking scraper")  # Tytuł obok logo
