@@ -1,5 +1,7 @@
 # Booking Scraper App 🏨
 
+**Note:** This project is created for educational purposes as part of a Master's degree in Computer Science and Econometrics at AGH University of Science and Technology in Krakow. It involves the use of web scraping and Streamlit. This app is not recommended for large-scale use due to limitations in scraping data from external websites.
+
 An interactive Streamlit application for searching hotels on Booking.com. This app allows users to easily browse hotel data and visualize results on an interactive map.
 
 ## 🎯 Key Features
