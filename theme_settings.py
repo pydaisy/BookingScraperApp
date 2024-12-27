@@ -313,28 +313,67 @@ def apply_theme(dark_mode, theme_file="data/material-theme_pink_blue.json"):
         }}
         
         svg[data-baseweb="icon"] {{
+                background-color: transparent !important;
+                color: {selected_theme['onSurface']} !important;
+                border: 2px !important;
+        }}
+        
+                
+        ul[data-testid="stSelectboxVirtualDropdown"] {{
                 background-color: {selected_theme['onTertiary']} !important;
+        }}
+        
+        ul[role="listbox"] {{
+                background-color: {selected_theme['onTertiary']} !important;
+        }}
+        
+        li[role="option"] {{
+        
                 color: {selected_theme['primary']} !important;
         }}
+
         
         /* Kalendarz */
         
         div[data-baseweb="calendar"] > div > div > div {{
-                background-color: {selected_theme['onTertiary']} !important;
+                background-color: {selected_theme['inversePrimary']} !important;
+                color: {selected_theme['onSurface']} !important;
                 font-family: 'Roboto Mono', sans-serif;
         }}
         
+        div[data-baseweb="calendar"] button {{
+                background-color: {selected_theme['inversePrimary']} !important;
+                color: {selected_theme['onSurface']} !important;
+                font-family: 'Roboto Mono', sans-serif;
+                border: 2px solid {selected_theme['onSurface']} !important; /* Dodanie ramki */
+                border-radius: 5px; 
+                padding: 5px 10px; 
+        }}
+        
         div[role="grid"] {{
-                color: {selected_theme['tertiary']} !important;
-                background-color: {selected_theme['onTertiary']} !important;
+                color: {selected_theme['onSurface']} !important;
+                background-color: {selected_theme['inversePrimary']} !important;
                 font-family: 'Roboto Mono', sans-serif;
         }}
         
         div[role="gridcell"] {{
-        color: {selected_theme['tertiary']} !important;
-                background-color: {selected_theme['onTertiary']} !important;
+        color: {selected_theme['onSurface']} !important;
+                background-color: {selected_theme['inversePrimary']} !important;
                 transform: none;
                 font-family: 'Roboto Mono', sans-serif;
+        }}
+        
+        div[role="presentation"] > div{{
+        color: {selected_theme['onSurface']} !important;
+                background-color: {selected_theme['inversePrimary']} !important;
+                transform: none;
+                font-family: 'Roboto Mono', sans-serif;
+        }}
+        
+        body > span {{
+        
+        --background-color: transparent !important;
+        
         }}
         
         /* Errory i powiadomienia */ 

@@ -70,7 +70,7 @@ def create_map(scraped_data, top_5_hotels=None, filter_top_5=False):
             location=[row['latitude'], row['longitude']],
             popup=popup_html,
             tooltip=f"{row['name']} ({row['price']} PLN)",
-            icon=folium.Icon(color=icon_color, icon="star" if is_top_5 else "info-sign")
+            icon=folium.Icon(color="pink" if is_top_5 else "cadetblue", icon_color = 'beige', icon="star" if is_top_5 else "heart")
         ).add_to(marker_cluster)
 
     return m
@@ -389,7 +389,7 @@ def home_content(dark_mode):
                 else:
                     st.error(f"{y_axis} data is not available.")
 
-        st.divider()
+                st.divider()
 
         col1, col2 = st.columns([3, 1])
 
@@ -466,17 +466,17 @@ def home_content(dark_mode):
                     st.plotly_chart(fig_3d, use_container_width=True)
                 else:
                     st.error(f"selected columns are not in the data: {x_axis_3d}, {y_axis_3d}, {z_axis_3d}.")
-            with col2:
-                st.write("""
-                #### price categories description:
+                with col2:
+                    st.write("""
+                    #### price categories description:
 
-                - **cheap**: items priced from 0 to 150 per night. these are affordable options suitable for budget-conscious buyers.
-                - **moderate**: prices between 150 and 300 per night. these items are moderately priced and offer a balance between quality and cost.
-                - **expensive**: items priced from 300 to 500 per night. these are higher-priced items often associated with luxury features or premium brands.
-                - **luxury**: items priced over 500 per night. these are high-end, exclusive products often linked to top-quality materials or prestigious brands.
-                """)
+                    - **cheap**: items priced from 0 to 150 per night. these are affordable options suitable for budget-conscious buyers.
+                    - **moderate**: prices between 150 and 300 per night. these items are moderately priced and offer a balance between quality and cost.
+                    - **expensive**: items priced from 300 to 500 per night. these are higher-priced items often associated with luxury features or premium brands.
+                    - **luxury**: items priced over 500 per night. these are high-end, exclusive products often linked to top-quality materials or prestigious brands.
+                    """)
 
-            st.divider()
+                st.divider()
 
 
 def write_about(dark_mode):
