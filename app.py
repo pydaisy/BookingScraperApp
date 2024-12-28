@@ -125,7 +125,7 @@ def home_content(dark_mode):
 
             col4_1, col4_2 = st.columns([1,1])
             with col4_2:
-                submit_button = st.form_submit_button("find my stay")
+                submit_button = st.form_submit_button("find my stay", use_container_width = True)
 
         if submit_button:
             if not city.strip():
