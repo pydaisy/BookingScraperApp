@@ -123,7 +123,9 @@ def home_content(dark_mode):
         with col4:
             adults_count = st.number_input("adults", min_value=1, value=2, step=1, help="number of adults")
 
-            submit_button = st.form_submit_button("find my stay")
+            col4_1, col4_2 = st.columns([1,1])
+            with col4_2:
+                submit_button = st.form_submit_button("find my stay")
 
         if submit_button:
             if not city.strip():
@@ -499,11 +501,11 @@ def write_about(dark_mode):
     st.subheader("✨ **what can you do here?**")
     st.write(
         """
-        - 🌍 **search Hotels**: input a destination, travel dates, and the number of guests to begin exploring.  
-        - 🕵️‍♀️ **scrape Data**: automatically collect detailed information about hotels, including prices, reviews, and distances from the city center.  
-        - 🗺️ **interactive Map**: visualize hotel locations, highlighting the top 5 based on your chosen criteria.  
-        - 📊 **analyze Trends**: dive into interactive charts and graphs, such as scatter plots and 3D visualizations, to better understand the market.  
-        - 💡 **customize Your Search**: refine results by selecting key metrics like price, ratings, or proximity.  
+        - 🌍 **search hotels**: input a destination, travel dates, and the number of guests to begin exploring.  
+        - 🕵️‍♀️ **scrape data**: automatically collect detailed information about hotels, including prices, reviews, and distances from the city center.  
+        - 🗺️ **interactive map**: visualize hotel locations, highlighting the top 5 based on your chosen criteria.  
+        - 📊 **analyze trends**: dive into interactive charts and graphs, such as scatter plots and 3D visualizations, to better understand the market.  
+        - 💡 **customize your search**: refine results by selecting key metrics like price, ratings, or proximity.  
         """
     )
 

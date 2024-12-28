@@ -129,6 +129,7 @@ def apply_theme(dark_mode, theme_file="data/material-theme_pink_blue.json"):
         button {{
             background-color: {selected_theme['surfaceTint']} !important;
             color: {selected_theme['onPrimary']} !important;
+            border-color: {selected_theme['surfaceTint']}  !important;
         }}
         
 
@@ -263,6 +264,12 @@ def apply_theme(dark_mode, theme_file="data/material-theme_pink_blue.json"):
                 color: {selected_theme['onSurface']} !important;
         }}
         
+        /*
+        
+        div[data-testid="stNumberInputContainer"] {{
+               border-color: {selected_theme['surfaceTint']}  !important;
+        }}
+        
         
         /* Ustawienie toggle button na prawo */
         
@@ -345,7 +352,7 @@ def apply_theme(dark_mode, theme_file="data/material-theme_pink_blue.json"):
                 background-color: {selected_theme['inversePrimary']} !important;
                 color: {selected_theme['onSurface']} !important;
                 font-family: 'Roboto Mono', sans-serif;
-                border: 2px solid {selected_theme['onSurface']} !important; /* Dodanie ramki */
+                border: 1px solid {selected_theme['onSurface']} !important; /* Dodanie ramki */
                 border-radius: 5px; 
                 padding: 5px 10px; 
         }}
