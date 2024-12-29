@@ -25,7 +25,7 @@ An interactive Streamlit application for searching hotels on Booking.com. This a
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/YourUsername/BookingScraperApp.git
+   git clone https://github.com/pydaisy/BookingScraperApp.git
    cd BookingScraperApp
 2. **Install dependencies: Ensure you have Python (version 3.8 or higher) installed. Then, install the required packages**:
    ```bash
