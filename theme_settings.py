@@ -22,7 +22,7 @@ def load_theme(file_path):
         return {}
 
 
-def apply_theme(dark_mode, theme_file="data/material-theme_pink_blue.json"):
+def apply_theme(dark_mode, theme_file="data/material-theme_green.json"):
     """Funkcja zmieniająca styl aplikacji na podstawie koloru wczytanego z pliku JSON.
         Args:
         dark_mode (bool): Określa, czy aktywować tryb ciemny.
@@ -425,7 +425,7 @@ def apply_theme(dark_mode, theme_file="data/material-theme_pink_blue.json"):
     )
 
 
-def generate_color_palette(dark_mode, theme_file="data/material-theme_pink_blue.json"):
+def generate_color_palette(dark_mode, theme_file="data/material-theme_green.json"):
     """
     Generuje paletę kolorów przechodzącą od koloru początkowego do końcowego.
 
