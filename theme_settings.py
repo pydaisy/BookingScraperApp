@@ -319,6 +319,14 @@ def apply_theme(dark_mode, theme_file="data/material-theme_green.json"):
                 color: {selected_theme['primary']} !important;
         }}
         
+        .stSelectbox > div > div {{
+                border-left-color: transparent !important;
+                border-top-color: transparent !important;
+                border-bottom-color: transparent !important;
+                border-right-color: transparent !important;
+        }}
+        
+        
         svg[data-baseweb="icon"] {{
                 background-color: transparent !important;
                 color: {selected_theme['onSurface']} !important;
@@ -418,7 +426,44 @@ def apply_theme(dark_mode, theme_file="data/material-theme_green.json"):
             cursor: pointer; /* Zmiana kursora */
         }}
         
-         
+        
+        div[data-baseweb="input"] {{
+                border-left-color: transparent !important;
+                border-top-color: transparent !important;
+                border-bottom-color: transparent !important;
+                border-right-color: transparent !important;
+        }}
+        
+        div[data-testid="stNumberInputContainer"] {{
+                border-left-color: transparent !important;
+                border-top-color: transparent !important;
+                border-bottom-color: transparent !important;
+                border-right-color: transparent !important;
+        }}
+        
+        
+        div[role="slider"] {{
+        
+                background-color: {selected_theme['primary']} !important;
+        }}
+        
+        div[role="slider"] > div {{
+        
+                color: {selected_theme['primary']} !important;
+        }}
+        
+        div[data-baseweb="slider"] > div > div {{
+            background: rgba(172, 177, 195, 0.25) !important;
+        }}
+        
+        div[data-testid="stSliderTickBarMax"] {{
+            background-color: transparent !important;
+        }}
+
+        div[data-testid="stSliderTickBarMin"] {{
+            background: transparent !important;
+        }}
+                 
         </style>
         """,
         unsafe_allow_html=True

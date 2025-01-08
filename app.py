@@ -11,21 +11,21 @@ import datetime
 import numpy as np
 
 
-def create_map(scraped_data, top_5_hotels=None, filter_top_5=False):
+def create_map(scraped_data, top_5_hotels = None, filter_top_5 = False):
     """
     Tworzy mapę z oznaczeniem hoteli, na podstawie danych zebranych przez scraper.
 
     Parametry:
-    - scraped_data: pd.DataFrame - DataFrame zawierający dane o hotelach, w tym współrzędne geograficzne.
-    - top_5_hotels: pd.DataFrame - DataFrame zawierający dane o top 5 hotelach do wyróżnienia.
-    - filter_top_5: bool - Czy wyświetlać tylko top 5 hoteli.
+    - scraped_data: pd.DataFrame-DataFrame zawierający dane o hotelach, w tym współrzędne geograficzne.
+    - top_5_hotels: pd.DataFrame-DataFrame zawierający dane o top 5 hotelach do wyróżnienia.
+    - filter_top_5: bool-Czy wyświetlać tylko top 5 hoteli.
 
     Zwraca:
     - folium.Map - Obiekt mapy z oznaczeniami hoteli.
     """
-    scraped_data['latitude'] = pd.to_numeric(scraped_data['latitude'], errors='coerce')
-    scraped_data['longitude'] = pd.to_numeric(scraped_data['longitude'], errors='coerce')
-    scraped_data = scraped_data.dropna(subset=['latitude', 'longitude'])
+    scraped_data['latitude'] = pd.to_numeric(scraped_data['latitude'], errors = 'coerce')
+    scraped_data['longitude'] = pd.to_numeric(scraped_data['longitude'], errors = 'coerce')
+    scraped_data = scraped_data.dropna(subset = ['latitude', 'longitude'])
 
     # Jeśli filtrujemy tylko top 5, ogranicz dane do top_5_hotels
     if filter_top_5 and top_5_hotels is not None:
@@ -35,8 +35,8 @@ def create_map(scraped_data, top_5_hotels=None, filter_top_5=False):
     center_lon = scraped_data['longitude'].mean()
 
     # Tworzenie mapy
-    m = folium.Map(location=[center_lat, center_lon], zoom_start=12, tiles='cartodbpositron')
-    marker_cluster = MarkerCluster(zoom_to_bounds_on_click=True).add_to(m)
+    m = folium.Map(location = [center_lat, center_lon], zoom_start = 12, tiles = 'cartodbpositron')
+    marker_cluster = MarkerCluster(zoom_to_bounds_on_click = True).add_to(m)
 
     for _, row in scraped_data.iterrows():
         popup_html = folium.Popup(
@@ -58,19 +58,19 @@ def create_map(scraped_data, top_5_hotels=None, filter_top_5=False):
                 <b>address:</b> {row['address']}<br>
             </div>
             """,
-            max_width=400
+            max_width = 400
         )
 
         price = row.get('price', None)
         icon_color = '#597700' if price and price < 200 else '#F2C824' if price and price < 500 else '#CC322F'
         is_top_5 = top_5_hotels is not None and row['name'] in top_5_hotels['name'].values
-        icon_color = '#FFD700' if is_top_5 else icon_color  # Złoty kolor dla top 5
 
         folium.Marker(
-            location=[row['latitude'], row['longitude']],
-            popup=popup_html,
-            tooltip=f"{row['name']} ({row['price']} PLN)",
-            icon=folium.Icon(color="pink" if is_top_5 else "cadetblue", icon_color = 'beige', icon="star" if is_top_5 else "heart")
+            location = [row['latitude'], row['longitude']],
+            popup = popup_html,
+            tooltip = f"{row['name']} ({row['price']} PLN)",
+            icon = folium.Icon(color = "pink" if is_top_5 else "cadetblue", icon_color = 'beige',
+                               icon = "star" if is_top_5 else "heart")
         ).add_to(marker_cluster)
 
     return m
@@ -88,7 +88,7 @@ def load_scraped_data(file_path: str) -> pd.DataFrame:
     """
     try:
         scraped_data = pd.read_csv(file_path)
-        scraped_data = scraped_data.dropna(subset=['latitude', 'longitude', 'hotel_type', 'num_review'])
+        scraped_data = scraped_data.dropna(subset = ['latitude', 'longitude', 'hotel_type', 'num_review'])
         st.success("...csv file loaded successfully!")
         return scraped_data
     except FileNotFoundError:
@@ -109,21 +109,21 @@ def home_content(dark_mode):
     """
 
     st.header("search hotels")
-    with st.form("booking_form", clear_on_submit=False):
+    with st.form("booking_form", clear_on_submit = False):
         col1, col2, col3, col4 = st.columns([3, 2, 2, 2])
 
         with col1:
-            city = st.text_input("where are we headed?", placeholder="destination")
+            city = st.text_input("where are we headed?", placeholder = "destination")
         with col2:
-            checkin = st.date_input("check-in", value=date.today(), min_value=date.today())
+            checkin = st.date_input("check-in", value = date.today(), min_value = date.today())
         with col3:
-            checkout = st.date_input("check-out", value=date.today() + datetime.timedelta(days=1),
-                                     min_value=date.today() + datetime.timedelta(days=1))
-        num_days = (checkout - checkin).days # Liczba nocy
+            checkout = st.date_input("check-out", value = date.today() + datetime.timedelta(days = 1),
+                                     min_value = date.today() + datetime.timedelta(days = 1))
+        num_days = (checkout - checkin).days  # Liczba nocy
         with col4:
-            adults_count = st.number_input("adults", min_value=1, value=2, step=1, help="number of adults")
+            adults_count = st.number_input("adults", min_value = 1, value = 2, step = 1, help = "number of adults")
 
-            col4_1, col4_2 = st.columns([1,1])
+            col4_1, col4_2 = st.columns([1, 1])
             with col4_2:
                 submit_button = st.form_submit_button("find my stay", use_container_width = True)
 
@@ -142,7 +142,7 @@ def home_content(dark_mode):
                 st.success("...link generated!")
                 st.markdown(
                     f"scraping may take a moment...[while scraping you can explore booking.com by yourself.]({link})",
-                    unsafe_allow_html=True)
+                    unsafe_allow_html = True)
 
                 # Spinner podczas scrapowania danych
                 with st.spinner("scraping hotel data..."):
@@ -154,8 +154,9 @@ def home_content(dark_mode):
                         # Spinner podczas ładowania danych
                         with st.spinner("loading scraped data..."):
                             scraped_data = load_scraped_data(data_file)
-                            scraped_data['price_range'] = pd.cut(scraped_data['price']/num_days, bins=[0, 150, 300, 500, np.inf],
-                                                                 labels=['cheap', 'moderate', 'expensive', 'luxury'])
+                            scraped_data['price_range'] = pd.cut(scraped_data['price'] / num_days,
+                                                                 bins = [0, 150, 300, 500, np.inf],
+                                                                 labels = ['cheap', 'moderate', 'expensive', 'luxury'])
                             st.session_state["scraped_data"] = scraped_data
                     except Exception as e:
                         st.error(f"oops! an error occurred during scraping: {e}")
@@ -199,7 +200,7 @@ def home_content(dark_mode):
                     st.subheader("show me top 5")
 
                     options = ['distance', 'rate_review', 'rating_stars', 'num_review', 'price']
-                    top_5_referring = st.selectbox("referring to...", options, index=0, help="""   Choose a criterion to filter the top 5 hotels based on:
+                    top_5_referring = st.selectbox("referring to...", options, index = 0, help = """   Choose a criterion to filter the top 5 hotels based on:
 
     - **distance**: hotels closest to the city center.
     - **rate_review**: hotels with the highest rating based on reviews.
@@ -207,57 +208,53 @@ def home_content(dark_mode):
     - **num_review**: hotels with the most reviews.
     - **price**: the cheapest hotels (lowest price).""")
 
+                    # Dodanie suwaka dla ceny
+                    min_price, max_price = int(scraped_data['price'].min()), int(scraped_data['price'].max())
+                    selected_price_range = st.slider("select price range (PLN)", min_value = min_price,
+                                                     max_value = max_price, value = (min_price, max_price))
+
+                    # Filtracja danych na podstawie zakresu cen
+                    filtered_data = scraped_data[
+                        (scraped_data['price'] >= selected_price_range[0]) &
+                        (scraped_data['price'] <= selected_price_range[1])
+                        ]
+
                     # Filtracja top 5 hoteli
-                    if top_5_referring in scraped_data.columns:
+                    if top_5_referring in filtered_data.columns:
                         if top_5_referring == 'price':
                             # dla ceny wybieramy najtańsze hotele
-                            top_5_hotels = scraped_data.nsmallest(5, top_5_referring)
+                            top_5_hotels = filtered_data.nsmallest(5, top_5_referring)
                         elif top_5_referring == 'rating_stars':
                             # dla ocen gwiazdkowych wybieramy najwyższe hotele
-                            top_5_hotels = scraped_data.nlargest(5, top_5_referring)
+                            top_5_hotels = filtered_data.nlargest(5, top_5_referring)
                         else:
                             # dla innych kryteriów (np. liczba recenzji, ocena) wybieramy najmniejsze lub największe
                             # wartości w zależności od kontekstu
-                            top_5_hotels = scraped_data.nsmallest(5, top_5_referring)
+                            top_5_hotels = filtered_data.nsmallest(5, top_5_referring)
 
-                    show_only_top_5 = st.checkbox("show only top 5 hotels on the map", value=False)
+                    show_only_top_5 = st.checkbox("show only top 5 hotels on the map", value = False)
                     st.divider()
 
                     with st.spinner("creating map..."):
-                        m = create_map(scraped_data, top_5_hotels, filter_top_5=show_only_top_5)
-                        st_folium(m, width=1200, height=1200)
+                        m = create_map(filtered_data, top_5_hotels, filter_top_5 = show_only_top_5)
+                        st_folium(m, width = 1200, height = 1200)
 
                     with col_data:
                         with st.container():
                             st.write(f"#### top 5 hotels sorted by {top_5_referring}:")
                             for index, row in top_5_hotels.iterrows():
-                                st.markdown(f"**{row['name']}** " + f"[click here to visit the hotel]({row['link']})") # Link do strony hotelu na booking
+                                st.markdown(
+                                    f"**{row['name']}** " + f"[click here to visit the hotel]({row['link']})")  # Link do strony hotelu na booking
                                 col1, col2 = st.columns(2)  # Dwie kolumny dla metryk
 
                                 with col1:
-                                    st.metric(label="price", value=f"{row['price']} pln")
-                                    st.metric(label="rating", value=f"{row['rating_stars']}/5 ☆")
+                                    st.metric(label = "price", value = f"{row['price']} pln")
+                                    st.metric(label = "rating", value = f"{row['rating_stars']}/5 ☆")
 
                                 with col2:
-                                    st.metric(label="review rate", value=f"{row['rate_review']} / 10")
-                                    st.metric(label="distance to city center", value=f"{row['distance']} m")
+                                    st.metric(label = "review rate", value = f"{row['rate_review']} / 10")
+                                    st.metric(label = "distance to city center", value = f"{row['distance']} m")
 
-
-                    # st.subheader("3D Hotel Trends")
-                    # if not scraped_data.empty:
-                    #     fig = px.scatter_3d(
-                    #         scraped_data,
-                    #         x='price',
-                    #         y='rating_stars',
-                    #         z='distance',
-                    #         color='price_range',
-                    #         size='num_review',
-                    #         hover_name='name',
-                    #         title="Hotel Analysis in 3D"
-                    #     )
-                    #     st.plotly_chart(fig, use_container_width=True)
-            else:
-                st.error("missing required geographic data in results.")
         else:
             st.info("fill in the form to see the results.")
 
@@ -271,46 +268,47 @@ def home_content(dark_mode):
             with col1:
 
                 st.subheader("customizable scatter plot")
+
                 options = ['distance', 'rate_review', 'rating_stars', 'num_review', 'price']
-                x_axis = st.selectbox("select X-axis", options, index=0)
-                y_axis = st.selectbox("select Y-axis", options, index=4)
+                x_axis = st.selectbox("select X-axis", options, index = 0)
+                y_axis = st.selectbox("select Y-axis", options, index = 4)
 
                 with st.spinner("generating your scatter plot..."):
                     if x_axis in scraped_data.columns and y_axis in scraped_data.columns:
                         fig = px.scatter(
                             scraped_data,
-                            x=x_axis,
-                            y=y_axis,
-                            color=y_axis,
-                            size=x_axis,
-                            color_continuous_scale=generate_color_palette(dark_mode)['palette'],
-                            labels={x_axis: x_axis, y_axis: y_axis},
-                            title=f"relation between {x_axis} and {y_axis}"
+                            x = x_axis,
+                            y = y_axis,
+                            color = y_axis,
+                            size = x_axis,
+                            color_continuous_scale = generate_color_palette(dark_mode)['palette'],
+                            labels = {x_axis: x_axis, y_axis: y_axis},
+                            title = f"relation between {x_axis} and {y_axis}"
                         )
-                        fig.update_traces(marker=dict(opacity=0.7, line=dict(width=1, color='black')))
+                        fig.update_traces(marker = dict(opacity = 0.7, line = dict(width = 1, color = 'black')))
                         fig.update_layout(
-                            modebar=dict(bgcolor='rgba(0,0,0,0)'),
-                            font=dict(family="Roboto Mono"),
-                            title=dict(
-                                font=dict(family="Roboto Mono", color=generate_color_palette(dark_mode)['title'])
+                            modebar = dict(bgcolor = 'rgba(0,0,0,0)'),
+                            font = dict(family = "Roboto Mono"),
+                            title = dict(
+                                font = dict(family = "Roboto Mono", color = generate_color_palette(dark_mode)['title'])
                             ),
-                            xaxis=dict(
-                                title=dict(
-                                    font=dict(family="Roboto Mono", size=14,
-                                              color=generate_color_palette(dark_mode)['text'])
+                            xaxis = dict(
+                                title = dict(
+                                    font = dict(family = "Roboto Mono", size = 14,
+                                                color = generate_color_palette(dark_mode)['text'])
                                 ),
-                                tickfont=dict(color=generate_color_palette(dark_mode)['text'])
+                                tickfont = dict(color = generate_color_palette(dark_mode)['text'])
                             ),
-                            yaxis=dict(
-                                title=dict(
-                                    font=dict(family="Roboto Mono", size=14,
-                                              color=generate_color_palette(dark_mode)['text'])
+                            yaxis = dict(
+                                title = dict(
+                                    font = dict(family = "Roboto Mono", size = 14,
+                                                color = generate_color_palette(dark_mode)['text'])
                                 ),
-                                tickfont=dict(color=generate_color_palette(dark_mode)['text'])
+                                tickfont = dict(color = generate_color_palette(dark_mode)['text'])
                             ),
-                            height=630
+                            height = 630
                         )
-                        st.plotly_chart(fig, use_container_width=True)
+                        st.plotly_chart(fig, use_container_width = True)
                     else:
                         st.error(f"the data does not contain the selected columns '{x_axis}' or '{y_axis}'.")
 
@@ -318,156 +316,126 @@ def home_content(dark_mode):
                 if x_axis in scraped_data.columns:
                     hist_fig_x = px.histogram(
                         scraped_data,
-                        x=x_axis,
-                        title=f"{x_axis} distribution",
-                        labels={x_axis: x_axis},
-                        nbins=20,
-                        color_discrete_sequence=[generate_color_palette(dark_mode)['middle']]
+                        x = x_axis,
+                        title = f"{x_axis} distribution",
+                        labels = {x_axis: x_axis},
+                        nbins = 20,
+                        color_discrete_sequence = [generate_color_palette(dark_mode)['middle']]
                     )
                     hist_fig_x.update_layout(
-                        xaxis=dict(
-                            title=dict(
-                                text=f"{x_axis}",
-                                font=dict(family="Roboto Mono", size=14,
-                                          color=generate_color_palette(dark_mode)['text'])
+                        xaxis = dict(
+                            title = dict(
+                                text = f"{x_axis}",
+                                font = dict(family = "Roboto Mono", size = 14,
+                                            color = generate_color_palette(dark_mode)['text'])
                             ),
-                            tickfont=dict(color=generate_color_palette(dark_mode)['text'])
+                            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
                         ),
-                        yaxis=dict(
-                            title=dict(
-                                text="count",
-                                font=dict(family="Roboto Mono", size=14,
-                                          color=generate_color_palette(dark_mode)['text'])
+                        yaxis = dict(
+                            title = dict(
+                                text = "count",
+                                font = dict(family = "Roboto Mono", size = 14,
+                                            color = generate_color_palette(dark_mode)['text'])
                             ),
-                            tickfont=dict(color=generate_color_palette(dark_mode)['text'])
+                            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
                         ),
-                        modebar=dict(bgcolor='rgba(0,0,0,0)'),
-                        font=dict(family="Roboto Mono"),
-                        title=dict(
-                            font=dict(family="Roboto Mono", color=generate_color_palette(dark_mode)['title'])
+                        modebar = dict(bgcolor = 'rgba(0,0,0,0)'),
+                        font = dict(family = "Roboto Mono"),
+                        title = dict(
+                            font = dict(family = "Roboto Mono", color = generate_color_palette(dark_mode)['title'])
                         ),
-                        height=410
+                        height = 410
                     )
 
-                    st.plotly_chart(hist_fig_x, use_container_width=True, key="hist_x")
+                    st.plotly_chart(hist_fig_x, use_container_width = True, key = "hist_x")
                 else:
                     st.error(f"{x_axis} data is not available.")
 
                 if y_axis in scraped_data.columns:
                     hist_fig_y = px.histogram(
                         scraped_data,
-                        x=y_axis,
-                        title=f"{y_axis} distribution",
-                        labels={y_axis: y_axis},
-                        nbins=20,
-                        color_discrete_sequence=[generate_color_palette(dark_mode)['middle']]
+                        x = y_axis,
+                        title = f"{y_axis} distribution",
+                        labels = {y_axis: y_axis},
+                        nbins = 20,
+                        color_discrete_sequence = [generate_color_palette(dark_mode)['middle']]
                     )
                     hist_fig_y.update_layout(
-                        xaxis=dict(
-                            title=dict(
-                                text=f"{y_axis}",
-                                font=dict(family="Roboto Mono", size=14,
-                                          color=generate_color_palette(dark_mode)['text'])
+                        xaxis = dict(
+                            title = dict(
+                                text = f"{y_axis}",
+                                font = dict(family = "Roboto Mono", size = 14,
+                                            color = generate_color_palette(dark_mode)['text'])
                             ),
-                            tickfont=dict(color=generate_color_palette(dark_mode)['text'])
+                            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
                         ),
-                        yaxis=dict(
-                            title=dict(
-                                text="count",
-                                font=dict(family="Roboto Mono", size=14,
-                                          color=generate_color_palette(dark_mode)['text'])
+                        yaxis = dict(
+                            title = dict(
+                                text = "count",
+                                font = dict(family = "Roboto Mono", size = 14,
+                                            color = generate_color_palette(dark_mode)['text'])
                             ),
-                            tickfont=dict(color=generate_color_palette(dark_mode)['text'])
+                            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
                         ),
-                        modebar=dict(bgcolor='rgba(0,0,0,0)'),
-                        font=dict(family="Roboto Mono"),
-                        title=dict(
-                            font=dict(family="Roboto Mono", color=generate_color_palette(dark_mode)['title'])
+                        modebar = dict(bgcolor = 'rgba(0,0,0,0)'),
+                        font = dict(family = "Roboto Mono"),
+                        title = dict(
+                            font = dict(family = "Roboto Mono", color = generate_color_palette(dark_mode)['title'])
                         ),
-                        height=410
+                        height = 410
                     )
 
-                    st.plotly_chart(hist_fig_y, use_container_width=True, key="hist_y")
+                    st.plotly_chart(hist_fig_y, use_container_width = True, key = "hist_y")
                 else:
                     st.error(f"{y_axis} data is not available.")
 
                 st.divider()
+        else:
+            st.info("fill in the form to see the results.")
 
-        col1, col2 = st.columns([3, 1])
+        col1, col2 = st.columns([3, 1.5])
 
         with col1:
             if "scraped_data" in st.session_state and not st.session_state["scraped_data"].empty:
                 scraped_data = st.session_state["scraped_data"]
                 st.subheader("treemap: hotel distribution by price range and...")
-                color_option = st.radio("choose color by", ['num_review', 'rate_review', 'rating_stars'], index=0,
-                                        horizontal=True)
+                color_option = st.radio("choose color by", ['num_review', 'rate_review', 'rating_stars'], index = 0,
+                                        horizontal = True)
                 if 'hotel_type' in scraped_data.columns and 'price_range' in scraped_data.columns:
                     treemap_fig = px.treemap(
                         scraped_data,
-                        path=['hotel_type', 'price_range'],
-                        values='price',
-                        color=color_option,
-                        color_continuous_scale=generate_color_palette(dark_mode)['palette']
+                        path = ['hotel_type', 'price_range'],
+                        values = 'price',
+                        color = color_option,
+                        color_continuous_scale = generate_color_palette(dark_mode)['palette']
                     )
 
                     # Aktualizacja etykiet w treemap
                     treemap_fig.update_traces(
-                        root_color='rgba(0,0,0,0)',
-                        marker=dict(cornerradius=5)
+                        root_color = 'rgba(0,0,0,0)',
+                        marker = dict(cornerradius = 5)
                     )
 
                     # Aktualizacja tytułów osi i ogólnej etykiety koloru
                     treemap_fig.update_layout(
-                        coloraxis_colorbar=dict(
-                            tickfont=dict(color=generate_color_palette(dark_mode)['title']),
+                        coloraxis_colorbar = dict(
+                            tickfont = dict(color = generate_color_palette(dark_mode)['title']),
                             # Zmiana koloru tekstu etykiet na skali kolorów
-                            titlefont=dict(color=generate_color_palette(dark_mode)['text'])  # Zmiana koloru tytułu skali kolorów
+                            titlefont = dict(color = generate_color_palette(dark_mode)['text'])
+                            # Zmiana koloru tytułu skali kolorów
                         ),
-                        paper_bgcolor='rgba(0,0,0,0)',
-                        plot_bgcolor='rgba(0,0,0,0)',
-                        margin=dict(t=30, l=25, r=25, b=25),
-                        font=dict(family="Roboto Mono"),
-                        modebar=dict(bgcolor='rgba(0,0,0,0)')
+                        paper_bgcolor = 'rgba(0,0,0,0)',
+                        plot_bgcolor = 'rgba(0,0,0,0)',
+                        margin = dict(t = 30, l = 25, r = 25, b = 25),
+                        font = dict(family = "Roboto Mono"),
+                        modebar = dict(bgcolor = 'rgba(0,0,0,0)')
                     )
 
-                    st.plotly_chart(treemap_fig, use_container_width=True)
+                    st.plotly_chart(treemap_fig, use_container_width = True)
                 else:
                     st.write(scraped_data.columns)
                     st.error("oops! columns do not exist.")
             if "scraped_data" in st.session_state and not st.session_state["scraped_data"].empty:
-                st.subheader("3D scatter plot: distance, rate_review, rating_stars")
-                options = ['distance', 'rate_review', 'rating_stars', 'num_review', 'price']
-                x_axis_3d = st.selectbox("select X-axis (3D)", options, index=0, key="x_3d")
-                y_axis_3d = st.selectbox("select Y-axis (3D)", options, index=1, key="y_3d")
-                z_axis_3d = st.selectbox("select Z-axis (3D)", options, index=2, key="z_3d")
-
-                if all(col in scraped_data.columns for col in [x_axis_3d, y_axis_3d, z_axis_3d]):
-                    fig_3d = px.scatter_3d(
-                        scraped_data,
-                        x=x_axis_3d,
-                        y=y_axis_3d,
-                        z=z_axis_3d,
-                        color=z_axis_3d,
-                        size=x_axis_3d,
-                        color_continuous_scale=generate_color_palette(dark_mode)['palette']
-                    )
-                    fig_3d.update_traces(marker=dict(opacity=0.7))
-                    fig_3d.update_layout(
-                        coloraxis_colorbar=dict(
-                            tickfont=dict(color=generate_color_palette(dark_mode)['title']),
-                            # Zmiana koloru tekstu etykiet na skali kolorów
-                            titlefont=dict(color=generate_color_palette(dark_mode)['text'])  # Zmiana koloru tytułu skali kolorów
-                        ),
-                        height=700,
-                        paper_bgcolor='rgba(0,0,0,0)',
-                        plot_bgcolor='rgba(0,0,0,0)',
-                        margin=dict(t=30, l=25, r=25, b=25),
-                        font=dict(family="Roboto Mono"),
-                        modebar=dict(bgcolor='rgba(0,0,0,0)'))
-
-                    st.plotly_chart(fig_3d, use_container_width=True)
-                else:
-                    st.error(f"selected columns are not in the data: {x_axis_3d}, {y_axis_3d}, {z_axis_3d}.")
                 with col2:
                     st.write("""
                     #### price categories description:
@@ -477,6 +445,71 @@ def home_content(dark_mode):
                     - **expensive**: items priced from 300 to 500 per night. these are higher-priced items often associated with luxury features or premium brands.
                     - **luxury**: items priced over 500 per night. these are high-end, exclusive products often linked to top-quality materials or prestigious brands.
                     """)
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            if "scraped_data" in st.session_state and not st.session_state["scraped_data"].empty:
+                st.subheader("fancy 3D plot")
+                col11, col12, col13 = st.columns([1, 0.1, 1])
+                with col11:
+                    options = ['distance', 'rate_review', 'rating_stars', 'num_review', 'price']
+                    x_axis_3d = st.selectbox("select X-axis (3D)", options, index = 0, key = "x_3d")
+                    y_axis_3d = st.selectbox("select Y-axis (3D)", options, index = 1, key = "y_3d")
+                    z_axis_3d = st.selectbox("select Z-axis (3D)", options, index = 2, key = "z_3d")
+                with col13:
+                    # Mapa typów hoteli z polskiego na angielski
+                    hotel_type_map = {
+                        "Hotel": "hotel",
+                        "Motel": "motel",
+                        "Aparthotel": "aparthotel",
+                        "Apartament": "apartment",
+                        "Hostel": "hostel",
+                        "Pensjonat": "guesthouse",
+                        "Willa": "villa"
+                    }
+
+                    # Opcje w języku angielskim + "all"
+                    hotel_type_options = ["all"] + list(hotel_type_map.values())
+
+                    # Użytkownik wybiera opcję w języku angielskim
+                    selected_hotel_type_english = st.radio("select hotel type", hotel_type_options, key = "hotel_type")
+
+                    # Jeśli "All", wybieramy cały DataFrame, inaczej tłumaczymy i filtrujemy
+                    if selected_hotel_type_english == "all":
+                        filtered_data = st.session_state["scraped_data"]
+                    else:
+                        # Znajdowanie polskiego odpowiednika
+                        selected_hotel_type = {v: k for k, v in hotel_type_map.items()}[selected_hotel_type_english]
+                        filtered_data = st.session_state["scraped_data"][
+                            st.session_state["scraped_data"]['hotel_type'] == selected_hotel_type
+                            ]
+
+                if all(col in filtered_data.columns for col in [x_axis_3d, y_axis_3d, z_axis_3d]):
+                    fig_3d = px.scatter_3d(
+                        filtered_data,
+                        x = x_axis_3d,
+                        y = y_axis_3d,
+                        z = z_axis_3d,
+                        color = z_axis_3d,
+                        size = x_axis_3d,
+                        color_continuous_scale = generate_color_palette(dark_mode)['palette']
+                    )
+                    fig_3d.update_traces(marker = dict(opacity = 0.7))
+                    fig_3d.update_layout(
+                        coloraxis_colorbar = dict(
+                            tickfont = dict(color = generate_color_palette(dark_mode)['title']),
+                            titlefont = dict(color = generate_color_palette(dark_mode)['text'])
+                        ),
+                        height = 700,
+                        paper_bgcolor = 'rgba(0,0,0,0)',
+                        plot_bgcolor = 'rgba(0,0,0,0)',
+                        margin = dict(t = 30, l = 25, r = 25, b = 25),
+                        font = dict(family = "Roboto Mono"),
+                        modebar = dict(bgcolor = 'rgba(0,0,0,0)')
+                    )
+
+                    st.plotly_chart(fig_3d, use_container_width = True)
+                else:
+                    st.error(f"selected columns are not in the data: {x_axis_3d}, {y_axis_3d}, {z_axis_3d}.")
 
                 st.divider()
 
@@ -527,7 +560,7 @@ def write_about(dark_mode):
         """
     )
 
-    st.image("data/image_doc_1.png", caption="example of filtering hotels by criteria", width=800)
+    st.image("data/image_doc_1.png", caption = "example of filtering hotels by criteria", width = 800)
 
     st.subheader("🔧 **what’s under the hood?**")
     st.write(
@@ -660,7 +693,6 @@ def write_about(dark_mode):
         """
     )
 
-
     st.write(
         """
         key features of the `theme_settings.py` file include:  
@@ -732,16 +764,16 @@ def write_about(dark_mode):
         happy scraping! 🌟
         </div>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html = True
     )
 
 
 def main():
     # Page configuration
     st.set_page_config(
-        page_title="booking scraper",
-        page_icon="🏨",
-        layout="wide"
+        page_title = "booking scraper",
+        page_icon = "🏨",
+        layout = "wide"
     )
 
     # Uruchomienie funkcji popup na początku
@@ -759,7 +791,7 @@ def main():
         <script>
             alert("hi there! before u start please set your browser zoom to 75% :) thanks!");
         </script>
-    """, height=0)  # Ustawienie odpowiedniej etykiety
+    """, height = 0)  # Ustawienie odpowiedniej etykiety
 
     # Inicjalizacja sesji
     if "page" not in st.session_state:
@@ -769,14 +801,14 @@ def main():
 
     with col2:
         # Tworzenie przycisków st.button
-        if st.button("home", key="home"):
+        if st.button("home", key = "home"):
             st.session_state["page"] = "home"
     with col3:
-        if st.button("about", key="about"):
+        if st.button("about", key = "about"):
             st.session_state["page"] = "about"
 
     # Dark mode toggle button
-    dark_mode = st.toggle("switch mode", value=False)
+    dark_mode = st.toggle("switch mode", value = False)
     apply_theme(dark_mode)
 
     st.title("🕸️booking scraper")  # Tytuł obok logo
