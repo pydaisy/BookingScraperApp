@@ -50,11 +50,9 @@ def apply_theme(dark_mode, theme_file="data/material-theme_green.json"):
             }}
             
             .css-1u4fkce {{
-    visibility: hidden;
-}}
-            
-
-            
+                visibility: hidden;
+            }}
+                 
         h1 {{
             font-family: 'Roboto Mono', sans-serif !important;
             font-weight: 700 !important;
@@ -483,6 +481,10 @@ def apply_theme(dark_mode, theme_file="data/material-theme_green.json"):
                 border-top-color: {selected_theme['onTertiary']} !important;
                 border-bottom-color: {selected_theme['onTertiary']} !important;
                 border-right-color: {selected_theme['onTertiary']} !important;
+        }}
+        
+        div .stExpander > details {{
+                border-color: {selected_theme['onTertiary']} !important;
         }}
                  
         </style>

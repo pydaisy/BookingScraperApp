@@ -61,8 +61,6 @@ def create_map(scraped_data, top_5_hotels = None, filter_top_5 = False):
             max_width = 400
         )
 
-        price = row.get('price', None)
-        icon_color = '#597700' if price and price < 200 else '#F2C824' if price and price < 500 else '#CC322F'
         is_top_5 = top_5_hotels is not None and row['name'] in top_5_hotels['name'].values
 
         folium.Marker(
@@ -625,8 +623,10 @@ def write_about(dark_mode):
            - use scatter plots and histograms to analyze relationships between metrics like price and reviews.  
            - switch to 3D views for a more dynamic exploration of data.  
         4. **top picks**:
-           - identify the best hotels based on your preferred metrics (e.g., lowest price, highest rating).
-           
+           - identify the best hotels based on your preferred metrics (e.g., lowest price, highest rating).  
+        5. **customize your theme**:
+           - use the **switch mode** toggle at the top of the page to switch between dark and light themes for an optimized viewing experience.
+
         **pro-tip**: if you're unsure about any feature, hover over the question mark icons (❓) to get more details.  
         """
     )
@@ -651,7 +651,7 @@ def write_about(dark_mode):
           - `app.py`: the main application logic for interacting with users and presenting data.  
         """
     )
-    with st.expander("scrapy_booking.py"):
+    with st.expander("scraper_booking.py"):
         st.write(
             """
             ### description of `scraper_booking.py`
@@ -739,6 +739,25 @@ def write_about(dark_mode):
             4. **`run_scraper(url)`**  
                initiates the scraping process by calling a pre-configured scraping function. this function makes use of dynamic url generation to scrape hotel data from booking.com based on the user’s input. it also handles potential errors or missing information gracefully, ensuring the app continues functioning even in case of incomplete data.
 
+            5. **`plot_histogram(data, column, dark_mode, title_suffix="distribution", height=410)`**  
+               creates a histogram for a specified column in the data.  
+               - **`data`**: input `DataFrame` containing hotel data.  
+               - **`column`**: name of the column to plot the histogram for.  
+               - **`dark_mode`**: adjusts the color scheme for dark mode.  
+               - **`title_suffix`**: additional text for the plot title.  
+               - **`height`**: height of the plot.  
+               returns a `plotly` histogram visualization.
+
+            6. **`write_about(dark_mode)`**  
+               displays the "about" page of the application, providing detailed descriptions of the app's features, technologies used, and tips for an optimal user experience.
+
+            7. **`main()`**  
+               the main function of the application:  
+               - sets up the page layout and title.  
+               - handles navigation between the "home" and "about" tabs.  
+               - includes a toggle for dark mode and applies themes dynamically.  
+               - calls the relevant functions (`home_content` or `write_about`) based on the selected tab.
+
             #### key features:
             - **interactive map**: visualize hotel locations on an interactive map with markers that provide additional details, such as price range and rating.  
             - **hotel search**: users can search for hotels by entering travel details such as city, dates, and guest count. the app then scrapes relevant hotel information from booking.com.  
@@ -747,9 +766,11 @@ def write_about(dark_mode):
             - **dark mode**: the app supports dark mode for improved user experience in low-light environments.  
             - **error handling**: the app is built with robust error handling, ensuring smooth user interaction even in cases of incomplete or invalid input.  
             - **price range classification**: hotels are classified into different price ranges, allowing users to easily find options within their budget.  
+            - **dynamic visualizations**: includes scatter plots, 3D plots, and histograms to explore trends in hotel data.  
+            - **heatmap of correlations**: displays a customizable correlation matrix for numerical data, helping users identify relationships between metrics.  
             - **booking link**: after the search, the app generates a direct link to booking.com for users to make reservations.  
 
-            this streamlit app is designed to be both informative and user-friendly, providing a streamlined process for discovering hotels and analyzing key data points in a visually appealing way. with the integration of interactive maps and dynamic filtering, it enhances the overall travel planning experience for users.
+            this streamlit app is designed to be both informative and user-friendly, providing a streamlined process for discovering hotels and analyzing key data points in a visually appealing way. with the integration of interactive maps, dynamic filtering, and rich visualizations, it enhances the overall travel planning experience for users.
             """
         )
 
