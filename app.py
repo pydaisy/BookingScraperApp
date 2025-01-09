@@ -513,7 +513,10 @@ def home_content(dark_mode):
             st.subheader("heatmap: correlation matrix")
 
             # Korelacja: wybierz kolumny numeryczne
-            numeric_columns = scraped_data.select_dtypes(include = ["number"]).columns
+            if 'scraped_data' in locals():
+                numeric_columns = scraped_data.select_dtypes(include = ["number"]).columns
+            else:
+                numeric_columns = []  # lub inna wartość domyślna
 
             if len(numeric_columns) > 1:
                 # Dodaj możliwość wyboru kolumn do analizy
