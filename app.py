@@ -75,6 +75,55 @@ def create_map(scraped_data, top_5_hotels = None, filter_top_5 = False):
 
     return m
 
+def plot_histogram(data, column, dark_mode, title_suffix="distribution", height=410):
+    """
+    Tworzy histogram dla określonej kolumny w danych.
+
+    Args:
+        data (DataFrame): Dane wejściowe.
+        column (str): Nazwa kolumny, dla której tworzony jest histogram.
+        dark_mode (bool): Flaga trybu ciemnego (dla kolorów).
+        title_suffix (str): Dodatkowy tekst do tytułu wykresu.
+        height (int): Wysokość wykresu.
+
+    Returns:
+        plotly.graph_objs._figure.Figure: Wykres histogramu.
+    """
+    if column not in data.columns:
+        return None
+
+    hist_fig = px.histogram(
+        data,
+        x=column,
+        title=f"{column} {title_suffix}",
+        labels={column: column},
+        nbins=20,
+        color_discrete_sequence=[generate_color_palette(dark_mode)['middle']]
+    )
+    hist_fig.update_layout(
+        xaxis=dict(
+            title=dict(
+                text=f"{column}",
+                font=dict(family="Roboto Mono", size=14, color=generate_color_palette(dark_mode)['text'])
+            ),
+            tickfont=dict(color=generate_color_palette(dark_mode)['text'])
+        ),
+        yaxis=dict(
+            title=dict(
+                text="count",
+                font=dict(family="Roboto Mono", size=14, color=generate_color_palette(dark_mode)['text'])
+            ),
+            tickfont=dict(color=generate_color_palette(dark_mode)['text'])
+        ),
+        modebar=dict(bgcolor='rgba(0,0,0,0)'),
+        font=dict(family="Roboto Mono"),
+        title=dict(
+            font=dict(family="Roboto Mono", color=generate_color_palette(dark_mode)['title'])
+        ),
+        height=height
+    )
+    return hist_fig
+
 
 def load_scraped_data(file_path: str) -> pd.DataFrame:
     """
@@ -161,11 +210,11 @@ def home_content(dark_mode):
                     except Exception as e:
                         st.error(f"oops! an error occurred during scraping: {e}")
 
-    # Tab layout
+    # Layout tabeli
     tabs = st.tabs(["hotels info", "understand the trends"])
 
     with tabs[0]:
-        # Map section
+        # Sekcja mapy
         if "scraped_data" in st.session_state and not st.session_state["scraped_data"].empty:
             scraped_data = st.session_state["scraped_data"]
             st.header(f"your __{city}__ experience awaits: __{checkin}-{checkout}__ for __{adults_count}__ guests")
@@ -200,7 +249,7 @@ def home_content(dark_mode):
                     st.subheader("show me top 5")
 
                     options = ['distance', 'rate_review', 'rating_stars', 'num_review', 'price']
-                    top_5_referring = st.selectbox("referring to...", options, index = 0, help = """   Choose a criterion to filter the top 5 hotels based on:
+                    top_5_referring = st.selectbox("referring to...", options, index = 0, help = """   choose a criterion to filter the top 5 spots based on:
 
     - **distance**: hotels closest to the city center.
     - **rate_review**: hotels with the highest rating based on reviews.
@@ -219,7 +268,7 @@ def home_content(dark_mode):
                         (scraped_data['price'] <= selected_price_range[1])
                         ]
 
-                    # Filtracja top 5 hoteli
+                    # Filtracja top 5 spotów
                     if top_5_referring in filtered_data.columns:
                         if top_5_referring == 'price':
                             # dla ceny wybieramy najtańsze hotele
@@ -232,7 +281,7 @@ def home_content(dark_mode):
                             # wartości w zależności od kontekstu
                             top_5_hotels = filtered_data.nsmallest(5, top_5_referring)
 
-                    show_only_top_5 = st.checkbox("show only top 5 hotels on the map", value = False)
+                    show_only_top_5 = st.checkbox("show only top 5 spots on the map", value = False)
                     st.divider()
 
                     with st.spinner("creating map..."):
@@ -241,7 +290,7 @@ def home_content(dark_mode):
 
                     with col_data:
                         with st.container():
-                            st.write(f"#### top 5 hotels sorted by {top_5_referring}:")
+                            st.write(f"#### top 5 spots sorted by {top_5_referring}:")
                             for index, row in top_5_hotels.iterrows():
                                 st.markdown(
                                     f"**{row['name']}** " + f"[click here to visit the hotel]({row['link']})")  # Link do strony hotelu na booking
@@ -314,85 +363,23 @@ def home_content(dark_mode):
 
             with col2:
                 if x_axis in scraped_data.columns:
-                    hist_fig_x = px.histogram(
-                        scraped_data,
-                        x = x_axis,
-                        title = f"{x_axis} distribution",
-                        labels = {x_axis: x_axis},
-                        nbins = 20,
-                        color_discrete_sequence = [generate_color_palette(dark_mode)['middle']]
-                    )
-                    hist_fig_x.update_layout(
-                        xaxis = dict(
-                            title = dict(
-                                text = f"{x_axis}",
-                                font = dict(family = "Roboto Mono", size = 14,
-                                            color = generate_color_palette(dark_mode)['text'])
-                            ),
-                            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
-                        ),
-                        yaxis = dict(
-                            title = dict(
-                                text = "count",
-                                font = dict(family = "Roboto Mono", size = 14,
-                                            color = generate_color_palette(dark_mode)['text'])
-                            ),
-                            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
-                        ),
-                        modebar = dict(bgcolor = 'rgba(0,0,0,0)'),
-                        font = dict(family = "Roboto Mono"),
-                        title = dict(
-                            font = dict(family = "Roboto Mono", color = generate_color_palette(dark_mode)['title'])
-                        ),
-                        height = 410
-                    )
-
-                    st.plotly_chart(hist_fig_x, use_container_width = True, key = "hist_x")
-                else:
-                    st.error(f"{x_axis} data is not available.")
+                    hist_fig_x = plot_histogram(scraped_data, x_axis, dark_mode)
+                    if hist_fig_x:
+                        st.plotly_chart(hist_fig_x, use_container_width = True, key = "hist_x")
+                    else:
+                        st.error(f"{x_axis} data is not available.")
 
                 if y_axis in scraped_data.columns:
-                    hist_fig_y = px.histogram(
-                        scraped_data,
-                        x = y_axis,
-                        title = f"{y_axis} distribution",
-                        labels = {y_axis: y_axis},
-                        nbins = 20,
-                        color_discrete_sequence = [generate_color_palette(dark_mode)['middle']]
-                    )
-                    hist_fig_y.update_layout(
-                        xaxis = dict(
-                            title = dict(
-                                text = f"{y_axis}",
-                                font = dict(family = "Roboto Mono", size = 14,
-                                            color = generate_color_palette(dark_mode)['text'])
-                            ),
-                            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
-                        ),
-                        yaxis = dict(
-                            title = dict(
-                                text = "count",
-                                font = dict(family = "Roboto Mono", size = 14,
-                                            color = generate_color_palette(dark_mode)['text'])
-                            ),
-                            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
-                        ),
-                        modebar = dict(bgcolor = 'rgba(0,0,0,0)'),
-                        font = dict(family = "Roboto Mono"),
-                        title = dict(
-                            font = dict(family = "Roboto Mono", color = generate_color_palette(dark_mode)['title'])
-                        ),
-                        height = 410
-                    )
+                    hist_fig_y = plot_histogram(scraped_data, y_axis, dark_mode)
+                    if hist_fig_y:
+                        st.plotly_chart(hist_fig_y, use_container_width = True, key = "hist_y")
+                    else:
+                        st.error(f"{y_axis} data is not available.")
 
-                    st.plotly_chart(hist_fig_y, use_container_width = True, key = "hist_y")
-                else:
-                    st.error(f"{y_axis} data is not available.")
-
-                st.divider()
         else:
             st.info("fill in the form to see the results.")
 
+        st.divider()
         col1, col2 = st.columns([3, 1.5])
 
         with col1:
@@ -419,7 +406,7 @@ def home_content(dark_mode):
                     # Aktualizacja tytułów osi i ogólnej etykiety koloru
                     treemap_fig.update_layout(
                         coloraxis_colorbar = dict(
-                            tickfont = dict(color = generate_color_palette(dark_mode)['title']),
+                            tickfont = dict(color = generate_color_palette(dark_mode)['text']),
                             # Zmiana koloru tekstu etykiet na skali kolorów
                             titlefont = dict(color = generate_color_palette(dark_mode)['text'])
                             # Zmiana koloru tytułu skali kolorów
@@ -445,6 +432,9 @@ def home_content(dark_mode):
                     - **expensive**: items priced from 300 to 500 per night. these are higher-priced items often associated with luxury features or premium brands.
                     - **luxury**: items priced over 500 per night. these are high-end, exclusive products often linked to top-quality materials or prestigious brands.
                     """)
+
+        st.divider()
+
         col1, col2 = st.columns([1, 1])
         with col1:
             if "scraped_data" in st.session_state and not st.session_state["scraped_data"].empty:
@@ -456,7 +446,7 @@ def home_content(dark_mode):
                     y_axis_3d = st.selectbox("select Y-axis (3D)", options, index = 1, key = "y_3d")
                     z_axis_3d = st.selectbox("select Z-axis (3D)", options, index = 2, key = "z_3d")
                 with col13:
-                    # Mapa typów hoteli z polskiego na angielski
+                    # Mapa typów hoteli z polskiego na angielski (dane mam po polsku bo scrpuje sie z polskiej strony booking.com)
                     hotel_type_map = {
                         "Hotel": "hotel",
                         "Motel": "motel",
@@ -483,35 +473,111 @@ def home_content(dark_mode):
                             st.session_state["scraped_data"]['hotel_type'] == selected_hotel_type
                             ]
 
-                if all(col in filtered_data.columns for col in [x_axis_3d, y_axis_3d, z_axis_3d]):
-                    fig_3d = px.scatter_3d(
-                        filtered_data,
-                        x = x_axis_3d,
-                        y = y_axis_3d,
-                        z = z_axis_3d,
-                        color = z_axis_3d,
-                        size = x_axis_3d,
-                        color_continuous_scale = generate_color_palette(dark_mode)['palette']
-                    )
-                    fig_3d.update_traces(marker = dict(opacity = 0.7))
-                    fig_3d.update_layout(
-                        coloraxis_colorbar = dict(
-                            tickfont = dict(color = generate_color_palette(dark_mode)['title']),
-                            titlefont = dict(color = generate_color_palette(dark_mode)['text'])
-                        ),
-                        height = 700,
-                        paper_bgcolor = 'rgba(0,0,0,0)',
-                        plot_bgcolor = 'rgba(0,0,0,0)',
-                        margin = dict(t = 30, l = 25, r = 25, b = 25),
-                        font = dict(family = "Roboto Mono"),
-                        modebar = dict(bgcolor = 'rgba(0,0,0,0)')
-                    )
-
-                    st.plotly_chart(fig_3d, use_container_width = True)
+                # Sprawdzenie unikalnych wartości hotel_type
+                if "hotel_type" in filtered_data.columns:
+                    unique_types = filtered_data['hotel_type'].dropna().unique()
+                    if len(unique_types) > 0:
+                        # Generowanie wykresu 3D
+                        if all(col in filtered_data.columns for col in [x_axis_3d, y_axis_3d, z_axis_3d]):
+                            fig_3d = px.scatter_3d(
+                                filtered_data,
+                                x = x_axis_3d,
+                                y = y_axis_3d,
+                                z = z_axis_3d,
+                                color = z_axis_3d,
+                                size = x_axis_3d,
+                                color_continuous_scale = generate_color_palette(dark_mode)['palette']
+                            )
+                            fig_3d.update_traces(marker = dict(opacity = 0.7))
+                            fig_3d.update_layout(
+                                coloraxis_colorbar = dict(
+                                    tickfont = dict(color = generate_color_palette(dark_mode)['title']),
+                                    titlefont = dict(color = generate_color_palette(dark_mode)['text'])
+                                ),
+                                height = 700,
+                                paper_bgcolor = 'rgba(0,0,0,0)',
+                                plot_bgcolor = 'rgba(0,0,0,0)',
+                                margin = dict(t = 30, l = 25, r = 25, b = 25),
+                                font = dict(family = "Roboto Mono"),
+                                modebar = dict(bgcolor = 'rgba(0,0,0,0)')
+                            )
+                            st.plotly_chart(fig_3d, use_container_width = True)
+                        else:
+                            st.error(f"selected columns are not in the data: {x_axis_3d}, {y_axis_3d}, {z_axis_3d}")
+                    else:
+                        st.warning(f"no valid hotel type found in the data for your city :((( ")
                 else:
-                    st.error(f"selected columns are not in the data: {x_axis_3d}, {y_axis_3d}, {z_axis_3d}.")
+                    st.error("the 'hotel_type' column is missing from the dataset")
 
-                st.divider()
+        with col2:
+            st.subheader("heatmap: correlation matrix")
+
+            # Korelacja: wybierz kolumny numeryczne
+            numeric_columns = scraped_data.select_dtypes(include = ["number"]).columns
+
+            if len(numeric_columns) > 1:
+                # Dodaj możliwość wyboru kolumn do analizy
+                selected_columns = st.multiselect(
+                    "select columns for correlation matrix",
+                    options = numeric_columns,
+                    default = numeric_columns
+                )
+
+                if len(selected_columns) > 1:
+                    # Obliczenie macierzy korelacji dla wybranych kolumn
+                    correlation_matrix = scraped_data[selected_columns].corr()
+                    correlation_matrix = correlation_matrix.round(3)
+
+                    # Możliwość filtrowania zakresu korelacji
+                    min_corr, max_corr = st.slider(
+                        "Select correlation range",
+                        min_value = -1.0,
+                        max_value = 1.0,
+                        value = (-1.0, 1.0),
+                        step = 0.1
+                    )
+
+                    # Maskowanie wartości poza zakresem
+                    filtered_correlation = correlation_matrix.applymap(
+                        lambda x: x if min_corr <= x <= max_corr else None
+                    )
+
+                    # Heatmapa korelacji
+                    heatmap_fig = px.imshow(
+                        filtered_correlation,
+                        color_continuous_scale = generate_color_palette(dark_mode)['palette'],
+                        labels = {"color": "correlation"},
+                        x = selected_columns,
+                        y = selected_columns,
+                        text_auto = True  # Dodanie wartości na heatmapie
+                    )
+
+                    # Dostosowanie stylu
+                    heatmap_fig.update_layout(
+                        font = dict(family = "Roboto Mono"),
+                        modebar = dict(bgcolor = 'rgba(0,0,0,0)'),
+                        xaxis = dict(
+                            title = dict(
+                                font = dict(family = "Roboto Mono", size = 14,
+                                            color = generate_color_palette(dark_mode)['text'])
+                            ),
+                            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
+                        ),
+                        yaxis = dict(
+                            title = dict(
+                                font = dict(family = "Roboto Mono", size = 14,
+                                            color = generate_color_palette(dark_mode)['text'])
+                            ),
+                            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
+                        ),
+                    )
+                    st.plotly_chart(heatmap_fig, use_container_width = True)
+                else:
+                    st.warning("please select at least two columns to compute correlations.")
+            else:
+                st.warning("not enough numeric columns to compute correlations.")
+
+        st.divider()
 
 
 def write_about(dark_mode):
@@ -654,8 +720,8 @@ def write_about(dark_mode):
             #### main functions:
             1. **`create_map(scraped_data, top_5_hotels=None, filter_top_5=False)`**  
                this function generates an interactive map that visualizes the scraped hotel data. each hotel is marked on the map, and additional details such as hotel name, price range, and rating can be viewed when users click on a marker.  
-               - **`top_5_hotels`** (optional): highlights the top 5 hotels based on user-specified criteria such as price or review rating.  
-               - **`filter_top_5`** (optional): when set to true, it filters the map to show only the top 5 hotels.  
+               - **`top_5_hotels`** (optional): highlights the top 5 spots based on user-specified criteria such as price or review rating.  
+               - **`filter_top_5`** (optional): when set to true, it filters the map to show only the top 5 spots.  
 
             2. **`load_scraped_data(file_path)`**  
                this function loads the hotel data from a csv file generated by the scraping process. it processes the data to handle missing values, clean up any inconsistencies, and add useful derived columns like **`price_range`**, which categorizes hotels into affordable, mid-range, and expensive price brackets.  
@@ -739,7 +805,7 @@ def write_about(dark_mode):
     st.subheader("💻 **tips for best experience**")
     st.write(
         """
-        - tor an optimal view, set your browser zoom to **75%**.  
+        - for an optimal view, set your browser zoom to **75%**.  
         - use the **dark mode toggle** for a more comfortable experience in low-light environments.  
         - if scraping takes time, feel free to explore the preloaded dataset in the app.  
         - enjoy exploring interactive elements such as maps, charts, and tabs.  

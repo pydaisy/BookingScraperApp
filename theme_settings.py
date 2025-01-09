@@ -288,12 +288,12 @@ def apply_theme(dark_mode, theme_file="data/material-theme_green.json"):
         /* Radio button - kolor */
         
         label[data-baseweb="radio"] {{
-                color: {selected_theme['onSurface']} !important;
+                color: {selected_theme['primary']} !important;
         }}
         
         /* Radio button - kolor */
         label[data-baseweb="radio"] > div:first-child {{
-                background-color: {selected_theme['onSurface']} !important;
+                background-color: {selected_theme['primary']} !important;
         }}
         
         /* Radio button - tytuly - kolor */
@@ -360,8 +360,8 @@ def apply_theme(dark_mode, theme_file="data/material-theme_green.json"):
                 background-color: {selected_theme['inversePrimary']} !important;
                 color: {selected_theme['onSurface']} !important;
                 font-family: 'Roboto Mono', sans-serif;
-                border: 1px solid {selected_theme['onSurface']} !important; /* Dodanie ramki */
-                border-radius: 5px; 
+                border: 1px solid transparent !important; /* Dodanie ramki */
+                border-radius: 10px; 
                 padding: 5px 10px; 
         }}
         
@@ -456,12 +456,33 @@ def apply_theme(dark_mode, theme_file="data/material-theme_green.json"):
             background: rgba(172, 177, 195, 0.25) !important;
         }}
         
-        div[data-testid="stSliderTickBarMax"] {{
+        div[data-testid="stSliderTickBar"] > div:nth-child(1) {{
             background-color: transparent !important;
         }}
-
-        div[data-testid="stSliderTickBarMin"] {{
+        
+        div[data-testid="stSliderTickBar"] > div:nth-child(2) {{
             background: transparent !important;
+        }}
+        
+        /* Tootltip help - znak zapytania */
+        div.stTooltipIcon > div > svg {{
+            stroke: {selected_theme['primary']} !important;
+        }}
+        
+        /* Multiselect */
+        #tabs-bui3-tabpanel-1 > div > div > div > div:nth-child(5) > div:nth-child(2) > div > div > div > div:nth-child(2) > div > div > div > div{{
+            background-color: transparent !important;
+        }}
+        
+        #tabs-bui3-tabpanel-1 > div > div > div > div:nth-child(5) > div:nth-child(2) > div > div > div > div:nth-child(2) > div > div > div > div > div:nth-child(1) > span {{
+            background-color: {selected_theme['onTertiary']} !important;
+        }}
+        
+        div[data-baseweb="select"] > div {{
+                border-left-color: {selected_theme['onTertiary']} !important;
+                border-top-color: {selected_theme['onTertiary']} !important;
+                border-bottom-color: {selected_theme['onTertiary']} !important;
+                border-right-color: {selected_theme['onTertiary']} !important;
         }}
                  
         </style>
@@ -493,8 +514,8 @@ def generate_color_palette(dark_mode, theme_file="data/material-theme_green.json
     text_color = selected_theme['onSurface']
 
     # Konwersja kolorów do przestrzeni RGB
-    start_rgb = mcolors.to_rgb(selected_theme['onTertiary'])
-    end_rgb = mcolors.to_rgb(selected_theme['tertiaryFixedDim'])
+    start_rgb = mcolors.to_rgb(selected_theme['secondaryContainer'])
+    end_rgb = mcolors.to_rgb(selected_theme['onTertiaryContainer'])
 
     # Interpolacja liniowa między kolorami
     palette = [
