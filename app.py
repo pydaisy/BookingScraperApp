@@ -75,7 +75,8 @@ def create_map(scraped_data, top_5_hotels = None, filter_top_5 = False):
 
     return m
 
-def plot_histogram(data, column, dark_mode, title_suffix="distribution", height=410):
+
+def plot_histogram(data, column, dark_mode, title_suffix = "distribution", height = 410):
     """
     Tworzy histogram dla określonej kolumny w danych.
 
@@ -94,33 +95,33 @@ def plot_histogram(data, column, dark_mode, title_suffix="distribution", height=
 
     hist_fig = px.histogram(
         data,
-        x=column,
-        title=f"{column} {title_suffix}",
-        labels={column: column},
-        nbins=20,
-        color_discrete_sequence=[generate_color_palette(dark_mode)['middle']]
+        x = column,
+        title = f"{column} {title_suffix}",
+        labels = {column: column},
+        nbins = 20,
+        color_discrete_sequence = [generate_color_palette(dark_mode)['middle']]
     )
     hist_fig.update_layout(
-        xaxis=dict(
-            title=dict(
-                text=f"{column}",
-                font=dict(family="Roboto Mono", size=14, color=generate_color_palette(dark_mode)['text'])
+        xaxis = dict(
+            title = dict(
+                text = f"{column}",
+                font = dict(family = "Roboto Mono", size = 14, color = generate_color_palette(dark_mode)['text'])
             ),
-            tickfont=dict(color=generate_color_palette(dark_mode)['text'])
+            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
         ),
-        yaxis=dict(
-            title=dict(
-                text="count",
-                font=dict(family="Roboto Mono", size=14, color=generate_color_palette(dark_mode)['text'])
+        yaxis = dict(
+            title = dict(
+                text = "count",
+                font = dict(family = "Roboto Mono", size = 14, color = generate_color_palette(dark_mode)['text'])
             ),
-            tickfont=dict(color=generate_color_palette(dark_mode)['text'])
+            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
         ),
-        modebar=dict(bgcolor='rgba(0,0,0,0)'),
-        font=dict(family="Roboto Mono"),
-        title=dict(
-            font=dict(family="Roboto Mono", color=generate_color_palette(dark_mode)['title'])
+        modebar = dict(bgcolor = 'rgba(0,0,0,0)'),
+        font = dict(family = "Roboto Mono"),
+        title = dict(
+            font = dict(family = "Roboto Mono", color = generate_color_palette(dark_mode)['title'])
         ),
-        height=height
+        height = height
     )
     return hist_fig
 
@@ -293,7 +294,8 @@ def home_content(dark_mode):
                             st.write(f"#### top 5 spots sorted by {top_5_referring}:")
                             for index, row in top_5_hotels.iterrows():
                                 st.markdown(
-                                    f"**{row['name']}** " + f"[click here to visit the hotel]({row['link']})")  # Link do strony hotelu na booking
+                                    f"**{row['name']}** " + f"[click here to visit the hotel]({row['link']})")  #
+                                # Link do strony hotelu na booking
                                 col1, col2 = st.columns(2)  # Dwie kolumny dla metryk
 
                                 with col1:
@@ -629,7 +631,7 @@ def write_about(dark_mode):
         """
     )
 
-    st.image("data/image_doc_1.png", caption = "example of filtering hotels by criteria", width = 800)
+    st.image("data/image_doc_1.png", caption = "example of filtering hotels by criteria", width = 600)
 
     st.subheader("🔧 **what’s under the hood?**")
     st.write(
