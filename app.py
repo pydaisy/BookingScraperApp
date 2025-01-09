@@ -375,12 +375,11 @@ def home_content(dark_mode):
                         st.plotly_chart(hist_fig_y, use_container_width = True, key = "hist_y")
                     else:
                         st.error(f"{y_axis} data is not available.")
-
+            st.divider()
         else:
             st.info("fill in the form to see the results.")
-
-        st.divider()
         col1, col2 = st.columns([3, 1.5])
+
 
         with col1:
             if "scraped_data" in st.session_state and not st.session_state["scraped_data"].empty:
@@ -433,7 +432,8 @@ def home_content(dark_mode):
                     - **luxury**: items priced over 500 per night. these are high-end, exclusive products often linked to top-quality materials or prestigious brands.
                     """)
 
-        st.divider()
+        if "scraped_data" in st.session_state and not st.session_state["scraped_data"].empty:
+            st.divider()
 
         col1, col2 = st.columns([1, 1])
         with col1:
@@ -510,77 +510,76 @@ def home_content(dark_mode):
                     st.error("the 'hotel_type' column is missing from the dataset")
 
         with col2:
-            st.subheader("heatmap: correlation matrix")
+            if "scraped_data" in st.session_state and not st.session_state["scraped_data"].empty:
+                st.subheader("heatmap: correlation matrix")
 
-            # Korelacja: wybierz kolumny numeryczne
-            if 'scraped_data' in locals():
-                numeric_columns = scraped_data.select_dtypes(include = ["number"]).columns
-            else:
-                numeric_columns = []  # lub inna wartość domyślna
-
-            if len(numeric_columns) > 1:
-                # Dodaj możliwość wyboru kolumn do analizy
-                selected_columns = st.multiselect(
-                    "select columns for correlation matrix",
-                    options = numeric_columns,
-                    default = numeric_columns
-                )
-
-                if len(selected_columns) > 1:
-                    # Obliczenie macierzy korelacji dla wybranych kolumn
-                    correlation_matrix = scraped_data[selected_columns].corr()
-                    correlation_matrix = correlation_matrix.round(3)
-
-                    # Możliwość filtrowania zakresu korelacji
-                    min_corr, max_corr = st.slider(
-                        "Select correlation range",
-                        min_value = -1.0,
-                        max_value = 1.0,
-                        value = (-1.0, 1.0),
-                        step = 0.1
-                    )
-
-                    # Maskowanie wartości poza zakresem
-                    filtered_correlation = correlation_matrix.applymap(
-                        lambda x: x if min_corr <= x <= max_corr else None
-                    )
-
-                    # Heatmapa korelacji
-                    heatmap_fig = px.imshow(
-                        filtered_correlation,
-                        color_continuous_scale = generate_color_palette(dark_mode)['palette'],
-                        labels = {"color": "correlation"},
-                        x = selected_columns,
-                        y = selected_columns,
-                        text_auto = True  # Dodanie wartości na heatmapie
-                    )
-
-                    # Dostosowanie stylu
-                    heatmap_fig.update_layout(
-                        font = dict(family = "Roboto Mono"),
-                        modebar = dict(bgcolor = 'rgba(0,0,0,0)'),
-                        xaxis = dict(
-                            title = dict(
-                                font = dict(family = "Roboto Mono", size = 14,
-                                            color = generate_color_palette(dark_mode)['text'])
-                            ),
-                            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
-                        ),
-                        yaxis = dict(
-                            title = dict(
-                                font = dict(family = "Roboto Mono", size = 14,
-                                            color = generate_color_palette(dark_mode)['text'])
-                            ),
-                            tickfont = dict(color = generate_color_palette(dark_mode)['text'])
-                        ),
-                    )
-                    st.plotly_chart(heatmap_fig, use_container_width = True)
+                # Korelacja: wybierz kolumny numeryczne
+                if 'scraped_data' in locals():
+                    numeric_columns = scraped_data.select_dtypes(include = ["number"]).columns
                 else:
-                    st.warning("please select at least two columns to compute correlations.")
-            else:
-                st.warning("not enough numeric columns to compute correlations.")
+                    numeric_columns = []  # lub inna wartość domyślna
 
-        st.divider()
+                if len(numeric_columns) > 1:
+                    # Dodaj możliwość wyboru kolumn do analizy
+                    selected_columns = st.multiselect(
+                        "select columns for correlation matrix",
+                        options = numeric_columns,
+                        default = numeric_columns
+                    )
+
+                    if len(selected_columns) > 1:
+                        # Obliczenie macierzy korelacji dla wybranych kolumn
+                        correlation_matrix = scraped_data[selected_columns].corr()
+                        correlation_matrix = correlation_matrix.round(3)
+
+                        # Możliwość filtrowania zakresu korelacji
+                        min_corr, max_corr = st.slider(
+                            "Select correlation range",
+                            min_value = -1.0,
+                            max_value = 1.0,
+                            value = (-1.0, 1.0),
+                            step = 0.1
+                        )
+
+                        # Maskowanie wartości poza zakresem
+                        filtered_correlation = correlation_matrix.applymap(
+                            lambda x: x if min_corr <= x <= max_corr else None
+                        )
+
+                        # Heatmapa korelacji
+                        heatmap_fig = px.imshow(
+                            filtered_correlation,
+                            color_continuous_scale = generate_color_palette(dark_mode)['palette'],
+                            labels = {"color": "correlation"},
+                            x = selected_columns,
+                            y = selected_columns,
+                            text_auto = True  # Dodanie wartości na heatmapie
+                        )
+
+                        # Dostosowanie stylu
+                        heatmap_fig.update_layout(
+                            font = dict(family = "Roboto Mono"),
+                            modebar = dict(bgcolor = 'rgba(0,0,0,0)'),
+                            xaxis = dict(
+                                title = dict(
+                                    font = dict(family = "Roboto Mono", size = 14,
+                                                color = generate_color_palette(dark_mode)['text'])
+                                ),
+                                tickfont = dict(color = generate_color_palette(dark_mode)['text'])
+                            ),
+                            yaxis = dict(
+                                title = dict(
+                                    font = dict(family = "Roboto Mono", size = 14,
+                                                color = generate_color_palette(dark_mode)['text'])
+                                ),
+                                tickfont = dict(color = generate_color_palette(dark_mode)['text'])
+                            ),
+                        )
+                        st.plotly_chart(heatmap_fig, use_container_width = True)
+                    else:
+                        st.warning("please select at least two columns to compute correlations.")
+                else:
+                    st.warning("not enough numeric columns to compute correlations.")
 
 
 def write_about(dark_mode):

@@ -468,11 +468,11 @@ def apply_theme(dark_mode, theme_file="data/material-theme_green.json"):
         }}
         
         /* Multiselect */
-        #tabs-bui3-tabpanel-1 > div > div > div > div:nth-child(5) > div:nth-child(2) > div > div > div > div:nth-child(2) > div > div > div > div{{
+        div[data-baseweb="select"] > div {{
             background-color: transparent !important;
         }}
         
-        #tabs-bui3-tabpanel-1 > div > div > div > div:nth-child(5) > div:nth-child(2) > div > div > div > div:nth-child(2) > div > div > div > div > div:nth-child(1) > span {{
+        span[data-baseweb="tag"] {{
             background-color: {selected_theme['onTertiary']} !important;
         }}
         
