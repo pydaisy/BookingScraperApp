@@ -262,6 +262,10 @@ def apply_theme(dark_mode, theme_file="data/material-theme_green.json"):
                 color: {selected_theme['onSurface']} !important;
         }}
         
+        div[data-testid="stWidgetLabel"] > div {{
+                background-color: transparent !important;
+        }}
+        
         /*
         
         div[data-testid="stNumberInputContainer"] {{
